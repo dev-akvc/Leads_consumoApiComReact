@@ -13,24 +13,22 @@ const isAuth = () => {
 // redirecionar o usuario caso ele esteja autenticado ou não
 
 const PrivateRoute = ({component: Component, ...rest}) => {
-    return(
+    return (
         <Route 
             {...rest}
-            render = { props => 
-                isAuth() ? (
-                    <Component {...props} />
-                ) : (
-                    <Redirect  to={{
+            render={props => 
+            isAuth() ? (
+                <Component {...props} />
+            ): (
+                <Redirect 
+                    to={{
                         pathname: '/',
-                        state: { message: "Usuário não autorizado."}
+                        state: { message: 'Usuário não autorizado' }
                     }}
-                    />
-                )
-
-            }
+                />
+            )}
         />
     );
 }
-
 
 export default PrivateRoute;
