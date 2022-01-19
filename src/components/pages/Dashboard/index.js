@@ -1,4 +1,7 @@
+/* eslint-disable no-undef */
 import react, { Component } from "react";
+import PubSub from "pubsub-js";
+
 import {
   Table,
   Button,
@@ -10,6 +13,11 @@ import {
 } from "reactstrap";
 
 class ListLead extends Component {
+
+  onEdit = (lead) => {
+    PubSub.publish("edit-lead", lead);
+  }
+
   render() {
     const { leads } = this.props;
     return (
@@ -29,16 +37,10 @@ class ListLead extends Component {
               <td>{lead.email}</td>
               <td>{lead.observacoes}</td>
               <td>
-                <Button 
-                  color="info"
-                  size="sm"
-                >
+                <Button color="info" size="sm" onClick={(e) => this.onEdit(lead)}>
                   Editar
                 </Button>
-                <Button
-                color="danger"
-                size="sm"
-                >
+                <Button color="danger" size="sm">
                   Deletar
                 </Button>
               </td>
@@ -51,13 +53,44 @@ class ListLead extends Component {
 }
 
 class FormLead extends Component {
+  state = {
+    model: {
+      nome: "",
+      email: "",
+      observacoes: "",
+    },
+  };
+
+  componentWillMount(){
+      PubSub.subscribe("edit-lead", (topic, lead) => {
+        this.setState({model: lead});  
+      });
+  }
+
+  setValues = (e, field) => {
+    const { model } = this.state;
+    model[field] = e.target.value;
+    this.setState({ model });
+  };
+
+  create = () => {
+    this.setState({model: { nome: "", email: "", observacoes: ""}})
+    this.props.leadCreate(this.state.model);
+  }
+
   render() {
     return (
       <Form>
         <FormGroup>
           <div className="form-row">
             <Label for="nome"> Nome </Label>
-            <Input id="nome" type="text" placeholder="Informe o nome do lead" />
+            <Input
+              id="nome"
+              type="text"
+              value={this.state.model.nome}
+              placeholder="Informe o nome do lead"
+              onChange={(e) => this.setValues(e, "nome")}
+            />
           </div>
         </FormGroup>
         <FormGroup>
@@ -66,7 +99,9 @@ class FormLead extends Component {
             <Input
               id="email"
               type="text"
+              value={this.state.model.email}
               placeholder="Informe o email do lead"
+              onChange={(e) => this.setValues(e, "email")}
             />
           </div>
         </FormGroup>
@@ -76,11 +111,13 @@ class FormLead extends Component {
             <Input
               id="observations"
               type="text"
+              value={this.state.model.observacoes}
               placeholder="Observações do lead"
+              onChange={(e) => this.setValues(e, "observacoes")}
             />
           </div>
         </FormGroup>
-        <Button color="primary" block>
+        <Button color="primary" block onClick={this.create}>
           ATUALIZAR
         </Button>
       </Form>
@@ -93,6 +130,10 @@ class Dashboard extends Component {
 
   state = {
     leads: [],
+    message: {
+      text: "",
+      alert: "",
+    }
   };
 
   componentDidMount() {
@@ -110,17 +151,63 @@ class Dashboard extends Component {
       .catch((e) => console.log(e));
   }
 
+  save = (lead) => {
+    let data = {
+      nome: lead.nome,
+      email: lead.email,
+      observacoes: lead.observacoes,
+    };
+    // Pegar token para atualizar valor
+    // const token = localStorage.getItem("token");
+    const requestInfo = {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: new Headers({
+        "Content-type": "application/json",
+        // enviar token no cabeçario da requisição
+        // Authorization: token,
+      }),
+    };
+    fetch(this.url, requestInfo)
+      .then((response) => response.json())
+      .then((newLead) => {
+        let { leads } = this.state;
+        leads.push(newLead);
+        this.setState({
+          leads,
+          message: {text: "Lead atualizado com sucesso. ", alert: "success", },
+        });
+        this.timerMessage(3000);
+      })
+      .catch((e) => console.log(e));
+  };
+
+  timerMessage = (duration) => {
+    setTimeout( () => {
+      this.setState({ message: {text: "", alert: ""}})
+    }, duration);
+  }
+
   render() {
     return (
       <div>
+        {
+          this.state.message.text !== "" ? (
+              <Alert color={this.state.message.alert} className="text-center">
+                {this.state.message.text}
+              </Alert>
+          ) : (
+            ""
+          )
+        }
         <div className="row">
           <div className="col-md-6 my-3">
             <h2 className="font-weight-bold text-center">ATUALIZAR LEAD</h2>
-            <FormLead />
+            <FormLead leadCreate={this.save}/>
           </div>
           <div className="col-md-6 my-3">
             <h2 className="font-weight-bold text-center">LISTA DE LEADS </h2>
-            <ListLead leads={this.state.leads}/>
+            <ListLead leads={this.state.leads} />
           </div>
         </div>
       </div>
