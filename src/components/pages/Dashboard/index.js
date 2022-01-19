@@ -18,7 +18,7 @@ class ListLead extends Component {
             <th>Nome</th>
             <th>Email</th>
             <th>Obs.</th>
-            <th>Actions</th>
+            <th>Actions asdf</th>
           </tr>
         </thead>
       </Table>
