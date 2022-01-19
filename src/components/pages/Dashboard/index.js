@@ -10,13 +10,16 @@ import {
   Label,
   Input,
   Alert,
+  Row,
 } from "reactstrap";
 
 class ListLead extends Component {
-
+  delete = (email) => {
+    this.props.deleteLead(email);
+  };
   onEdit = (lead) => {
     PubSub.publish("edit-lead", lead);
-  }
+  };
 
   render() {
     const { leads } = this.props;
@@ -37,10 +40,18 @@ class ListLead extends Component {
               <td>{lead.email}</td>
               <td>{lead.observacoes}</td>
               <td>
-                <Button color="info" size="sm" onClick={(e) => this.onEdit(lead)}>
+                <Button
+                  color="info"
+                  size="sm"
+                  onClick={(e) => this.onEdit(lead)}
+                >
                   Editar
                 </Button>
-                <Button color="danger" size="sm">
+                <Button
+                  color="danger"
+                  size="sm"
+                  onClick={(e) => this.delete(lead.email)}
+                >
                   Deletar
                 </Button>
               </td>
@@ -61,10 +72,10 @@ class FormLead extends Component {
     },
   };
 
-  componentWillMount(){
-      PubSub.subscribe("edit-lead", (topic, lead) => {
-        this.setState({model: lead});  
-      });
+  componentWillMount() {
+    PubSub.subscribe("edit-lead", (topic, lead) => {
+      this.setState({ model: lead });
+    });
   }
 
   setValues = (e, field) => {
@@ -74,9 +85,9 @@ class FormLead extends Component {
   };
 
   create = () => {
-    this.setState({model: { nome: "", email: "", observacoes: ""}})
+    this.setState({ model: { nome: "", email: "", observacoes: "" } });
     this.props.leadCreate(this.state.model);
-  }
+  };
 
   render() {
     return (
@@ -133,7 +144,7 @@ class Dashboard extends Component {
     message: {
       text: "",
       alert: "",
-    }
+    },
   };
 
   componentDidMount() {
@@ -175,7 +186,7 @@ class Dashboard extends Component {
         leads.push(newLead);
         this.setState({
           leads,
-          message: {text: "Lead atualizado com sucesso. ", alert: "success", },
+          message: { text: "Lead atualizado com sucesso. ", alert: "success" },
         });
         this.timerMessage(3000);
       })
@@ -183,31 +194,50 @@ class Dashboard extends Component {
   };
 
   timerMessage = (duration) => {
-    setTimeout( () => {
-      this.setState({ message: {text: "", alert: ""}})
+    setTimeout(() => {
+      this.setState({ message: { text: "", alert: "" } });
     }, duration);
-  }
+  };
+
+  delete = (email) => {
+    const token = localStorage.getItem("token");
+    const requestInfo = {
+      method: "DELETE",
+      headers: new Headers({
+        "Content-type": "application/json",
+        Authorization: token,
+      }),
+    };
+    fetch(`${this.url}/${email}`, requestInfo)
+      .then((rows) => {
+        const leads = this.state.leads.filter((lead) => lead.email !== email);
+        this.setState({
+          leads,
+          message: { text: "Lead deletado com sucesso. ", alert: "danger" },
+        });
+        this.timerMessage(3000);
+      })
+      .catch((e) => console.log(e));
+  };
 
   render() {
     return (
       <div>
-        {
-          this.state.message.text !== "" ? (
-              <Alert color={this.state.message.alert} className="text-center">
-                {this.state.message.text}
-              </Alert>
-          ) : (
-            ""
-          )
-        }
+        {this.state.message.text !== "" ? (
+          <Alert color={this.state.message.alert} className="text-center">
+            {this.state.message.text}
+          </Alert>
+        ) : (
+          ""
+        )}
         <div className="row">
           <div className="col-md-6 my-3">
             <h2 className="font-weight-bold text-center">ATUALIZAR LEAD</h2>
-            <FormLead leadCreate={this.save}/>
+            <FormLead leadCreate={this.save} />
           </div>
           <div className="col-md-6 my-3">
             <h2 className="font-weight-bold text-center">LISTA DE LEADS </h2>
-            <ListLead leads={this.state.leads} />
+            <ListLead leads={this.state.leads} deleteLead={this.delete} />
           </div>
         </div>
       </div>
