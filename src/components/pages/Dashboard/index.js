@@ -11,6 +11,7 @@ import {
 
 class ListLead extends Component {
   render() {
+    const { leads } = this.props;
     return (
       <Table className="table-bordered text-center">
         <thead className="thead-dark">
@@ -18,9 +19,32 @@ class ListLead extends Component {
             <th>Nome</th>
             <th>Email</th>
             <th>Obs.</th>
-            <th>Actions asdf</th>
+            <th>Actions</th>
           </tr>
         </thead>
+        <tbody>
+          {leads.map((lead) => (
+            <tr key={lead.email}>
+              <td>{lead.nome}</td>
+              <td>{lead.email}</td>
+              <td>{lead.observacoes}</td>
+              <td>
+                <Button 
+                  color="info"
+                  size="sm"
+                >
+                  Editar
+                </Button>
+                <Button
+                color="danger"
+                size="sm"
+                >
+                  Deletar
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
       </Table>
     );
   }
@@ -65,6 +89,27 @@ class FormLead extends Component {
 }
 
 class Dashboard extends Component {
+  url = "http://localhost:8080/leads";
+
+  state = {
+    leads: [],
+  };
+
+  componentDidMount() {
+    let token = localStorage.getItem("token");
+    const requestInfo = {
+      method: "GET",
+      headers: new Headers({
+        "Content-type": "application/json",
+        Authorization: token,
+      }),
+    };
+    fetch(this.url, requestInfo)
+      .then((response) => response.json())
+      .then((leads) => this.setState({ leads }))
+      .catch((e) => console.log(e));
+  }
+
   render() {
     return (
       <div>
@@ -75,7 +120,7 @@ class Dashboard extends Component {
           </div>
           <div className="col-md-6 my-3">
             <h2 className="font-weight-bold text-center">LISTA DE LEADS </h2>
-            <ListLead />
+            <ListLead leads={this.state.leads}/>
           </div>
         </div>
       </div>
