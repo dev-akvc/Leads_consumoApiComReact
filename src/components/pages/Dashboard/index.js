@@ -24,7 +24,7 @@ class ListLead extends Component {
   render() {
     const { leads } = this.props;
     return (
-      <Table className="table-bordered text-center">
+      <Table className="table-bordered text-center text-white">
         <thead className="thead-dark">
           <tr>
             <th>Nome</th>
@@ -93,31 +93,31 @@ class FormLead extends Component {
     return (
       <Form>
         <FormGroup>
-          <div className="form-row">
+          <div className="form-row text-white">
             <Label for="nome"> Nome </Label>
             <Input
               id="nome"
               type="text"
               value={this.state.model.nome}
-              placeholder="Informe o nome do lead"
+              placeholder="Nome do lead"
               onChange={(e) => this.setValues(e, "nome")}
             />
           </div>
         </FormGroup>
         <FormGroup>
-          <div className="form-row">
+          <div className="form-row text-white">
             <Label for="email"> Email </Label>
             <Input
               id="email"
               type="text"
               value={this.state.model.email}
-              placeholder="Informe o email do lead"
+              placeholder="Email do lead"
               onChange={(e) => this.setValues(e, "email")}
             />
           </div>
         </FormGroup>
         <FormGroup>
-          <div className="form-row">
+          <div className="form-row text-white">
             <Label for="observations"> Observações </Label>
             <Input
               id="observations"
@@ -232,11 +232,11 @@ class Dashboard extends Component {
         )}
         <div className="row">
           <div className="col-md-6 my-3">
-            <h2 className="font-weight-bold text-center">ATUALIZAR LEAD</h2>
+            <h2 className="font-weight-bold text-center text-white" >ATUALIZAR LEAD</h2>
             <FormLead leadCreate={this.save} />
           </div>
           <div className="col-md-6 my-3">
-            <h2 className="font-weight-bold text-center">LISTA DE LEADS </h2>
+            <h2 className="font-weight-bold text-center text-white">LISTA DE LEADS </h2>
             <ListLead leads={this.state.leads} deleteLead={this.delete} />
           </div>
         </div>

@@ -45,7 +45,7 @@ export default class Login extends Component {
 
     render() {
         return(
-            <div className="col-md-6">
+            <div className="Login">
                 <Header title="Página de login"/>
                 <hr />
                 {
@@ -56,11 +56,11 @@ export default class Login extends Component {
                 <Form>
                     <FormGroup>
                         <Label for="email"> Email</Label>
-                        <Input type="text" id="email" onChange={e => this.email = e.target.value} placeholder="Informe o seu email: " />
+                        <Input type="text" id="email" onChange={e => this.email = e.target.value} placeholder="Informe o email " />
                     </FormGroup> 
                     <FormGroup>
                         <Label for="password"> Senha</Label>
-                        <Input type="password" id="password" onChange={e => this.password = e.target.value} placeholder="Informe a sua senha: " />
+                        <Input type="password" id="password" onChange={e => this.password = e.target.value} placeholder="Informe a senha " />
                     </FormGroup> 
                     <Button color="primary" block onClick={this.signIn}> Entrar </Button>
                 </Form>

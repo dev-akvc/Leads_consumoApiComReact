@@ -4,3 +4,37 @@
     justify-content: center;
     margin-top: 100px;
 }
+
+body{
+    background-image: url(purple_shine_glare_shades_abstraction_4k_hd_abstract-1280x720.jpg);
+    background-size: cover;
+}
+
+header {
+    text-align: center;
+}
+
+.titulo{
+    color: purple;
+    display: flex;
+}
+
+.Landing {
+
+    background-color: black ;
+    border-radius: 15px;
+    color: purple;
+    margin-bottom: 5%;
+    height: 400px;
+    width: 400px;
+    padding: 30px;
+}
+
+.Login{
+    background-color: black;
+    border-radius: 15px;
+    color: purple;
+    min-height: 400px;
+    min-width: 400px;
+    padding: 30px;
+}
